@@ -1,0 +1,29 @@
+api:
+  insecure: true
+  dashboard: true
+
+providers:
+  docker:
+    exposedbydefault: false
+    endpoint: "unix:///var/run/docker.sock"
+    network: traefik
+
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+entryPoints:
+  http:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+  https:
+    address: ":443"
+  postgres:
+    address: ":5432"
+
+log:
+  level: DEBUG

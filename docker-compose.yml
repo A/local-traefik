@@ -1,0 +1,34 @@
+version: '3.3'
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  acme:
+
+services:
+  traefik:
+    image: ${TRAEFIK_IMAGE:-traefik}:${TRAEFIK_VERSION:-latest}
+    hostname: ${TRAEFIK_API_HOST}
+    restart: always
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`${TRAEFIK_API_HOST}`)
+      - traefik.http.routers.dashboard.entrypoints=https
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.services.dashboard.loadbalancer.server.port=8080
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/:/etc/traefik:ro
+      - ./certs:/etc/certs:ro
+
+    ports:
+      - 80:80
+      - 443:443
+      - 5432:5432
+
+    networks:
+      - traefik
